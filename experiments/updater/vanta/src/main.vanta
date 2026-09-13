@@ -1,0 +1,11 @@
+module Main;
+
+# Vanta 0.1 cannot read arguments, so `run` demonstrates one fixed decision:
+# updating from 4.0 to v4.1.
+func Start()::void {
+    if Allows(4, 0, 0, "v4.1", 4, 1, 0, false) {
+        emit("allow");
+    } else {
+        emit("block");
+    }
+}

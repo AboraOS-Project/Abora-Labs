@@ -1,0 +1,32 @@
+# Abora Labs experiment: updater downgrade guard implemented in Vanta.
+# Reference: docs/labs/manifest.md
+
+name = "updater-vanta"
+description = "Numeric-only downgrade guard in Vanta 0.1 (no strings, files or arguments yet)"
+area = "updater"
+implementation = "vanta"
+language = "vanta"
+status = "experimental"
+maintainer = "AnimatedGTVR"
+dependencies = []
+requires = ["vanta", "make"]
+
+[commands]
+# Vanta 0.1 has no imports: the Makefile "links" by appending the guard to each entry file.
+build = ["make"]
+test = ["vanta", "run", "build/main_test.vanta"]
+run = ["vanta", "run", "build/main.vanta"]
+clean = ["make", "clean"]
+
+[test]
+format = "labs"
+
+[safety]
+# Pure decision logic over fixed integers. Touches nothing.
+level = "safe"
+risks = []
+
+[metrics]
+# Interpreted: there is no native artifact to measure.
+artifacts = []
+startup = ["vanta", "run", "build/main.vanta"]

@@ -73,6 +73,7 @@ python_scripts=(
   "scripts/rebuild-vm.py"
   "scripts/run-qemu.py"
   "scripts/dev-doctor.py"
+  "scripts/check-all-files.py"
   "scripts/abora-config-gui.py"
   "scripts/abora-welcome-gui.py"
   "scripts/abora-gaming-welcome-gui.py"
@@ -160,7 +161,7 @@ fi
 # being caught after they ship. `go vet` and `go test` here are intentionally
 # separate from a full lint pass (golangci-lint isn't assumed to be
 # installed) -- this is the same baseline safety net every other language in
-# this repo already gets from check-scripts.sh/check-all-files.sh.
+# this repo already gets from check-scripts.sh/check-all-files.py.
 if command -v go >/dev/null 2>&1; then
   if (cd "$repo_dir/vendor/mint" && go build ./... >/dev/null 2>&1); then
     pass "vendor/mint: go build"
@@ -4844,34 +4845,27 @@ else
   pass "git unavailable (abora-build ref-switch test skipped)"
 fi
 
-# Regression test: check-all-files.sh's find_files()/find_shebang_scripts()
-# excludes generated build directories. C# leaves obj/bin under tools/*,
-# Rust leaves target/, and git ignores all of them; plain `find` needs the
-# same pruning or it can sweep stale generated JSON as if it were source.
-# Extracts the real find_files() function and runs it against a sandbox
-# tree shaped like a real dotnet project layout (a real committed .json
+# Regression test: check-all-files' find_files() excludes generated build
+# directories. C# leaves obj/bin under tools/*, Rust leaves target/, and git
+# ignores all of them; a plain filesystem walk needs the same pruning or it
+# can sweep stale generated JSON as if it were source. Runs the real
+# file listing (`check-all-files.py --list-files`) against a sandbox tree
+# shaped like a real dotnet project layout (a real committed .json
 # alongside a fake tools/*/obj/*.json), confirming the real file is found
 # and the build-artifact one is not.
-tmp_findfiles_funcs="$(mktemp)"
-sed -n '/^find_files() {/,/^}$/p' scripts/check-all-files.sh > "$tmp_findfiles_funcs"
 tmp_findfiles_tree="$(mktemp -d)"
 mkdir -p "$tmp_findfiles_tree/nix/pkgs" "$tmp_findfiles_tree/tools/fake-project/obj/Debug" "$tmp_findfiles_tree/tools/rust-crate/target/debug"
 printf '{"real": true}\n' > "$tmp_findfiles_tree/nix/pkgs/real-deps.json"
 printf '{"generated": true}\n' > "$tmp_findfiles_tree/tools/fake-project/obj/Debug/project.assets.json"
 printf '{"generated": true}\n' > "$tmp_findfiles_tree/tools/rust-crate/target/debug/build.json"
-if bash -n "$tmp_findfiles_funcs" 2>/dev/null; then
-  _findfiles_out="$(cd "$tmp_findfiles_tree" && bash -c "source '$tmp_findfiles_funcs'; find_files json")"
-else
-  _findfiles_out="<extraction failed>"
-fi
-rm -f "$tmp_findfiles_funcs"
+_findfiles_out="$(scripts/check-all-files.py --list-files json "$tmp_findfiles_tree" 2>&1 || printf '<listing failed>')"
 rm -rf "$tmp_findfiles_tree"
 if grep -qx 'nix/pkgs/real-deps.json' <<<"$_findfiles_out" \
   && ! grep -q 'obj/Debug/project.assets.json' <<<"$_findfiles_out" \
   && ! grep -q 'target/debug/build.json' <<<"$_findfiles_out"; then
-  pass "runtime: check-all-files.sh's find_files() excludes generated build artifacts"
+  pass "runtime: check-all-files' find_files() excludes generated build artifacts"
 else
-  fail "runtime: check-all-files.sh's find_files() excludes generated build artifacts"
+  fail "runtime: check-all-files' find_files() excludes generated build artifacts"
   printf '              found: %s\n' "$_findfiles_out"
 fi
 

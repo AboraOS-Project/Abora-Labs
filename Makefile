@@ -134,7 +134,7 @@ check-desktops:
 	./scripts/check-desktops.sh
 
 check-all:
-	./scripts/check-all-files.sh
+	./scripts/check-all-files.py
 
 preflight:
 	./scripts/preflight.py

@@ -16,7 +16,7 @@ Use this after a local release build or after the GitHub ISO workflow succeeds.
 
 - run `make doctor` and fix any Nix daemon/store or nixpkgs source failures first
 - run `./scripts/check-scripts.sh`
-- run `./scripts/check-all-files.sh`
+- run `./scripts/check-all-files.py`
 - run `./scripts/check-desktops.sh`
 - confirm `docs/screenshots.md` matches the current installer flow
 - confirm the setup launcher files are tracked by Git so flakes can include them

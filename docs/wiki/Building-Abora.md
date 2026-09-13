@@ -141,7 +141,7 @@ make metadata
 
 ```sh
 ./scripts/check-scripts.sh
-./scripts/check-all-files.sh
+./scripts/check-all-files.py
 ./scripts/check-desktops.sh
 ```
 

@@ -67,7 +67,7 @@ Make sure these checks are done:
 
 - `make doctor`
 - `./scripts/check-scripts.sh`
-- `./scripts/check-all-files.sh`
+- `./scripts/check-all-files.py`
 - `./scripts/check-desktops.sh`
 - every edition ISO builds successfully
 - at least the default Cosmic live image boots

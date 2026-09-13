@@ -8,7 +8,7 @@ path there applies). Run this before tagging a release: if a listed file is
 missing from the checkout, any installed Abora system that later runs
 `sudo abora update` against this tag will fail validate_upstream_checkout()
 and refuse to update -- catching that here, at tag time, is much cheaper than
-a user hitting it. check-scripts.sh verifies the two lists stay in sync.
+a user hitting it. make check verifies the two lists stay in sync.
 """
 
 from __future__ import annotations

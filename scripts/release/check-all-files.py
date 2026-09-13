@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Glob-based repo sweep, independent of check-scripts.sh's hardcoded file lists.
+"""Glob-based repo sweep, independent of check-scripts.py's hardcoded file lists.
 
 Walks every .sh, .nix, .py, .md, .yml/.yaml, .json/.jsonc and .desktop file
 actually on disk (skipping out/, .git/, vendor/ and the TinyPM/ submodule --
@@ -13,7 +13,7 @@ Usage:
   check-all-files.py                     run the sweep
   check-all-files.py --list-files EXT [ROOT]
                                          print the files the sweep would visit for one
-                                         extension (used by check-scripts.sh's tests)
+                                         extension (used by check-scripts.py's tests)
 
 Exit status: 1 on any failure or elevated warning ([warn+]), else 0.
 """

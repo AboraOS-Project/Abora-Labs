@@ -32,7 +32,7 @@ make metadata         # Refresh release metadata only (no ISO rebuild)
 
 Direct script equivalents (same as Make targets):
 ```sh
-./scripts/check-scripts.sh   # What `make check` runs
+./scripts/check-scripts.py   # What `make check` runs
 ./scripts/check-desktops.py  # What `make check-desktops` runs
 ./scripts/preflight.py       # What `make preflight` runs
 ./scripts/rebuild-vm.py      # Rebuild in the VM workspace
@@ -78,7 +78,7 @@ Key scripts:
 
 ### UI Library Convention
 
-All scripts source `abora-ui.sh` (or `/etc/abora/ui.sh` on-system) for shared primitives. The env var `ABORA_UI_LIB` overrides the path — `check-scripts.sh` tests scripts in isolation by passing a non-existent path and verifying the fallback inline UI activates correctly.
+All scripts source `abora-ui.sh` (or `/etc/abora/ui.sh` on-system) for shared primitives. The env var `ABORA_UI_LIB` overrides the path — the test suites run scripts in isolation by passing a non-existent path and verifying the fallback inline UI activates correctly.
 
 ### ANIX
 
@@ -90,7 +90,7 @@ All scripts source `abora-ui.sh` (or `/etc/abora/ui.sh` on-system) for shared pr
 
 ### Desktop Profiles
 
-`scripts/abora-desktop-profiles.sh` is a sourced library (not a standalone script). It defines two functions per desktop: `abora_desktop_config_block` (NixOS service/session config) and `abora_desktop_package_block` (packages). The split is important — `check-scripts.sh` explicitly tests that config blocks do not contain `environment.systemPackages`.
+`scripts/abora-desktop-profiles.sh` is a sourced library (not a standalone script). It defines two functions per desktop: `abora_desktop_config_block` (NixOS service/session config) and `abora_desktop_package_block` (packages). The split is important — `scripts/config/tests/desktop.test.sh` explicitly tests that config blocks do not contain `environment.systemPackages`.
 
 ### Installed System Config
 
@@ -101,5 +101,5 @@ After installation, user-facing config lives in `/etc/nixos/abora-local.nix`. Th
 - All scripts use `set -euo pipefail` and locate the repo root via `CDPATH= cd -- "$(dirname -- "$0")/.." && pwd`.
 - The `out/` directory is generated — never commit files there.
 - `VERSION` file drives the version string used everywhere (build, ISO filename, release metadata).
-- Scripts must be executable (`chmod +x`) — `check-scripts.sh` enforces this.
+- Scripts must be executable (`chmod +x`) — `make check` enforces this.
 - Desktop profile additions require changes in `abora-desktop-profiles.sh` (the library), `abora-installer.sh` (installer menu), `anix.sh` (`valid_desktops` array), and `nix/modules/installed-base.nix`.

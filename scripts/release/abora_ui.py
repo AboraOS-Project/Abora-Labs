@@ -4,7 +4,7 @@ Mirrors the message helpers in scripts/core/abora-ui.sh (abora_info,
 abora_success, abora_warn, abora_error) so Python tools look the same as the
 Bash ones. Like the Bash scripts, pointing ABORA_UI_LIB at a file that does
 not exist selects the plain fallback ("[ok]", "[warn]", "[fail]"), which
-check-scripts.sh uses to test output in isolation.
+the test suites use to check output in isolation.
 """
 
 from __future__ import annotations

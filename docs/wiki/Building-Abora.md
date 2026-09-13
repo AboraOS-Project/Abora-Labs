@@ -140,7 +140,7 @@ make metadata
 ## Useful Checks
 
 ```sh
-./scripts/check-scripts.sh
+./scripts/check-scripts.py
 ./scripts/check-all-files.py
 ./scripts/check-desktops.py
 ```

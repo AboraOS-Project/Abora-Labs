@@ -131,7 +131,7 @@ switch_timeout="${ABORA_SWITCH_TIMEOUT:-1800}"
 # printing colored UI text) and just shells out for the decision itself.
 # Defaults to relying on PATH (present via Nix systemPackages on any real
 # Abora system); source checkouts may also have the debug binary from
-# check-scripts.sh/dotnet build, which keeps `bash scripts/abora-update.sh
+# make check's dotnet build, which keeps `bash scripts/abora-update.sh
 # --check` useful before an ISO has shipped the new package.
 resolve_resolver_bin() {
     local candidate repo_dir
@@ -1644,7 +1644,7 @@ ensure_flake_layout() {
     repair_flake_layout_if_needed
 }
 
-# Hidden __test-* entry points let check-scripts.sh exercise these internal
+# Hidden __test-* entry points let scripts/support/tests/update.test.sh exercise these internal
 # functions directly (flake writing, upstream validation, channel/ref
 # resolution, pre-alpha confirmation) without going through the real
 # argument-parsing/re-exec-as-root/network-fetch path below.

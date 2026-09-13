@@ -128,7 +128,7 @@ desktop-preview:
 	./scripts/abora-desktop-preview.sh "$(PROFILE)" "$(or $(XKB),us)" "$(or $(DESKTOP_USER),user)"
 
 check:
-	./scripts/check-scripts.sh
+	./scripts/check-scripts.py
 
 check-desktops:
 	./scripts/check-desktops.py

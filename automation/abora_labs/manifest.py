@@ -28,20 +28,27 @@ TARGET = re.compile(r"^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$")
 
 @dataclass(frozen=True)
 class Command:
-    """An argv list, exec'd directly. Abora has no shell, so neither do Labs commands:
-    multi-step work belongs in the implementation's build tool (a Makefile, CMake presets)."""
+    """An argv list (exec'd directly, preferred) or a shell string (run with `sh -c`).
+
+    Shell is no longer Abora's primary language: it is easy to break and hard to
+    make safe. String commands still work, but `validate` warns about them."""
 
     argv: tuple[str, ...]
+    shell: bool = False
 
     @property
     def display(self) -> str:
-        return shlex.join(self.argv)
+        return self.argv[0] if self.shell else shlex.join(self.argv)
 
     def with_args(self, args: tuple[str, ...]) -> Command:
-        return Command(self.argv + args) if args else self
+        if not args:
+            return self
+        if self.shell:
+            return Command((f"{self.argv[0]} {shlex.join(args)}",), shell=True)
+        return Command(self.argv + args)
 
     def to_argv(self) -> list[str]:
-        return list(self.argv)
+        return ["sh", "-c", self.argv[0]] if self.shell else list(self.argv)
 
 
 @dataclass(frozen=True)
@@ -92,15 +99,16 @@ def _command(value: object, key: str, problems: list[str]) -> Command | None:
         return None
     if isinstance(value, list) and value and all(isinstance(v, str) and v for v in value):
         return Command(tuple(value))
-    if isinstance(value, str):
-        example = json.dumps(shlex.split(value) if _splittable(value) else ["make", key.rsplit(".", 1)[-1]])
-        problems.append(
-            f"`{key}` is a shell string ({value!r}); Abora has no shell, so write it as an argv list "
-            f"(e.g. {example}) and move pipes, redirects or `&&` chains into a Makefile or the build tool"
-        )
-        return None
-    problems.append(f"`{key}` must be a non-empty list of strings (argv)")
+    if isinstance(value, str) and value.strip():
+        return Command((value,), shell=True)
+    problems.append(f"`{key}` must be a non-empty list of strings (argv, preferred) or a shell string")
     return None
+
+
+def argv_suggestion(command: Command, stage: str) -> str:
+    """An argv list to use instead of a shell string, for warning messages."""
+    value = command.argv[0]
+    return json.dumps(shlex.split(value) if _splittable(value) else ["make", stage])
 
 
 def _splittable(value: str) -> bool:

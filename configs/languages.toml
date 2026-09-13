@@ -7,7 +7,8 @@
 #   scaffold                starting commands written by `abora-labs new`
 #                           ({name} is replaced with the experiment's binary name)
 #
-# Commands are argv lists, exec'd directly. Abora has no shell: anything that
+# Commands are argv lists, exec'd directly (strings run via `sh -c` but are
+# discouraged: shell is no longer Abora's primary language). Anything that
 # needs several steps, pipes or redirects goes in a Makefile or the build tool.
 #
 # Nix is deliberately not a language here: it is the system foundation.

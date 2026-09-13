@@ -57,8 +57,7 @@ class Outcome:
     def crashed(self) -> bool:
         if self.signal_name is not None and self.signal_name in {s.name for s in CRASH_SIGNALS}:
             return True
-        # Wrappers that run the real program as a child (e.g. `dotnet run`) may
-        # report a child killed by signal N as exit 128+N.
+        # `sh -c` (and wrappers like `dotnet run`) report a child killed by signal N as exit 128+N.
         return self.exit_code is not None and self.exit_code - 128 in {int(s) for s in CRASH_SIGNALS}
 
     def describe(self) -> str:

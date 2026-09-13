@@ -10,7 +10,7 @@ from .config import LabsConfig
 from .discovery import Discovery
 from .errors import LabsError
 from .evaluation import load_evaluation
-from .manifest import Experiment
+from .manifest import Experiment, argv_suggestion
 from .safety import STAGES, lint_text
 from .toolchain import missing, resolve_tools
 from .workspace import Workspace
@@ -65,6 +65,15 @@ def _lint_commands(exp: Experiment, where: str) -> list[Problem]:
     for stage, command in checks:
         if command is None:
             continue
+        if command.shell:
+            problems.append(
+                Problem(
+                    WARNING,
+                    where,
+                    f"`{stage}` is a shell string; prefer an argv list (e.g. {argv_suggestion(command, stage)}) "
+                    "and move pipes, redirects or `&&` chains into a Makefile or the build tool",
+                )
+            )
         level = exp.safety.for_stage(stage)
         text = " ".join(command.argv)
         for finding in lint_text(text, where, exp.safety.acknowledge):
@@ -87,7 +96,11 @@ def _lint_scripts(ws: Workspace, config: LabsConfig, exp: Experiment) -> list[Pr
     for path in _script_files(exp.directory, config.exclude_dirs):
         if path.name.endswith(SHELL_SUFFIXES):
             problems.append(
-                Problem(ERROR, ws.relative(path), "shell scripts are not part of Abora; use a Makefile or a language from configs/languages.toml")
+                Problem(
+                    WARNING,
+                    ws.relative(path),
+                    "shell script: shell is no longer Abora's primary language; prefer a Makefile or a language from configs/languages.toml",
+                )
             )
         try:
             text = path.read_text(encoding="utf-8", errors="replace")

@@ -80,7 +80,7 @@ Important files:
 - `scripts/abora-support-report.sh`: support archive generation
 - `scripts/check-scripts.sh`: repo script and runtime sanity checks
 - `scripts/check-all-files.py`: broad syntax, links, YAML, JSON, and docs sweep
-- `scripts/check-desktops.sh`: evaluates every supported desktop profile
+- `scripts/check-desktops.py`: evaluates every supported desktop profile
 - `scripts/build-iso.py`: ISO-only build path
 - `scripts/package-tinypm.py`: TinyPM release package path
 - `scripts/release-metadata.py`: checksums, manifest, and release notes

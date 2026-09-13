@@ -33,7 +33,7 @@ make metadata         # Refresh release metadata only (no ISO rebuild)
 Direct script equivalents (same as Make targets):
 ```sh
 ./scripts/check-scripts.sh   # What `make check` runs
-./scripts/check-desktops.sh  # What `make check-desktops` runs
+./scripts/check-desktops.py  # What `make check-desktops` runs
 ./scripts/preflight.py       # What `make preflight` runs
 ./scripts/rebuild-vm.py      # Rebuild in the VM workspace
 ```

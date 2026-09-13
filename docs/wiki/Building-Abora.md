@@ -25,7 +25,7 @@ printing a long Nix stack trace. Fix the daemon/store first, or point the
 check at a known nixpkgs checkout/source path:
 
 ```sh
-ABORA_NIXPKGS_PATH=/nix/store/...-source ./scripts/check-desktops.sh
+ABORA_NIXPKGS_PATH=/nix/store/...-source ./scripts/check-desktops.py
 ```
 
 ## Build The Default ISO
@@ -142,7 +142,7 @@ make metadata
 ```sh
 ./scripts/check-scripts.sh
 ./scripts/check-all-files.py
-./scripts/check-desktops.sh
+./scripts/check-desktops.py
 ```
 
 Run `make doctor` first if `check-desktops` cannot find nixpkgs or reports

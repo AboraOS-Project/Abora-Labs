@@ -124,7 +124,7 @@ class Doctor:
         if source is None:
             self.fail("no nixpkgs source found — check-desktops/preflight need one.")
             self.ui.info("  Set ABORA_NIXPKGS_PATH to a nixpkgs checkout/store path, or configure NIX_PATH.")
-            self.ui.info("  Example: ABORA_NIXPKGS_PATH=/nix/store/...-source ./scripts/check-desktops.sh")
+            self.ui.info("  Example: ABORA_NIXPKGS_PATH=/nix/store/...-source ./scripts/check-desktops.py")
             return
         expr = f'let pkgs = import {source} {{ system = "x86_64-linux"; }}; in pkgs.lib.version'
         imported = quiet(["nix-instantiate", "--eval", "--strict", "--expr", expr])
@@ -134,7 +134,7 @@ class Doctor:
             self.fail("nixpkgs source was found but cannot be imported — check-desktops/preflight will fail.")
             self.ui.info(f"  Source: {source}")
             self.ui.info("  This usually means the Nix daemon/store is unavailable or not writable by this user.")
-            self.ui.info(f"  After fixing Nix, retry: ABORA_NIXPKGS_PATH={source} ./scripts/check-desktops.sh")
+            self.ui.info(f"  After fixing Nix, retry: ABORA_NIXPKGS_PATH={source} ./scripts/check-desktops.py")
 
     def run(self) -> int:
         print()

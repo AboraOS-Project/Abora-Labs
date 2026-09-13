@@ -14,7 +14,7 @@ from abora_release import repo_root
 STAGES = (
     ("script and runtime checks", "./scripts/check-scripts.sh"),
     ("full repository file sweep", "./scripts/check-all-files.py"),
-    ("desktop profile evaluation", "./scripts/check-desktops.sh"),
+    ("desktop profile evaluation", "./scripts/check-desktops.py"),
 )
 
 

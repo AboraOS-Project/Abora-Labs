@@ -131,7 +131,7 @@ check:
 	./scripts/check-scripts.sh
 
 check-desktops:
-	./scripts/check-desktops.sh
+	./scripts/check-desktops.py
 
 check-all:
 	./scripts/check-all-files.py

@@ -41,7 +41,6 @@ bash_scripts=(
   "scripts/abora-ui.sh"
   "scripts/abora-welcome.sh"
   "scripts/anix.sh"
-  "scripts/check-desktops.sh"
   "scripts/abora-theme-sync.sh"
   "scripts/abora-update.sh"
   "scripts/check-scripts.sh"
@@ -74,6 +73,7 @@ python_scripts=(
   "scripts/run-qemu.py"
   "scripts/dev-doctor.py"
   "scripts/check-all-files.py"
+  "scripts/check-desktops.py"
   "scripts/abora-config-gui.py"
   "scripts/abora-welcome-gui.py"
   "scripts/abora-gaming-welcome-gui.py"
@@ -827,7 +827,7 @@ if [[ -z "$_old_branding_matches" ]] \
   && grep -q 'v4 Everest alpha default' docs/wiki/Updating-Abora.md \
   && grep -q 'release_name="${ABORA_RELEASE_NAME:-Abora OS v4 Everest}"' scripts/abora-support-report.sh \
   && grep -q "printf 'v4 Everest'" scripts/abora-ui.sh \
-  && grep -q 'release_short="v4 Everest"' scripts/check-desktops.sh \
+  && grep -q 'RELEASE_SHORT = "v4 Everest"' scripts/check-desktops.py \
   && grep -q 'PRETTY_NAME = "Abora OS v4 Everest"' nix/profiles/live.nix \
   && grep -q 'PRETTY_NAME = "Abora OS v4 Everest"' nix/modules/installed-base.nix \
   && grep -q 'VERSION = "v4 Everest"' nix/profiles/live.nix \

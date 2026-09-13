@@ -45,12 +45,7 @@ bash_scripts=(
   "scripts/abora-theme-sync.sh"
   "scripts/abora-update.sh"
   "scripts/build-iso.sh"
-  "scripts/package-anix.sh"
-  "scripts/build-tinypm-image.sh"
-  "scripts/package-tinypm.sh"
-  "scripts/preflight.sh"
   "scripts/rebuild-vm.sh"
-  "scripts/check-release-files.sh"
   "scripts/run-qemu.sh"
   "scripts/check-scripts.sh"
   "scripts/dev-doctor.sh"
@@ -70,6 +65,13 @@ nix_files=(
 
 python_scripts=(
   "scripts/release-metadata.py"
+  "scripts/release/abora_release.py"
+  "scripts/release/tarball.py"
+  "scripts/package-anix.py"
+  "scripts/build-tinypm-image.py"
+  "scripts/package-tinypm.py"
+  "scripts/preflight.py"
+  "scripts/check-release-files.py"
   "scripts/abora-config-gui.py"
   "scripts/abora-welcome-gui.py"
   "scripts/abora-gaming-welcome-gui.py"
@@ -767,7 +769,7 @@ if command -v shellcheck >/dev/null 2>&1; then
   # info/warning-level style nits (SC1007, SC2015, SC2016, SC2086, etc.) are
   # exactly the kind of thing check-all's shellcheck warning tier is for, not
   # a hard gate here on every push.
-  if shellcheck -S error scripts/abora-update.sh scripts/abora-repair-flake-purity.sh scripts/check-release-files.sh; then
+  if shellcheck -S error scripts/abora-update.sh scripts/abora-repair-flake-purity.sh; then
     pass "shellcheck: updater and repair scripts"
   else
     fail "shellcheck: updater and repair scripts"
@@ -1065,19 +1067,19 @@ else
   fail "runtime: abora.gpu accepts legacy/batch auto values as a no-op"
 fi
 
-if scripts/check-release-files.sh >/dev/null; then
+if scripts/check-release-files.py >/dev/null; then
   pass "runtime: release file manifest"
 else
   fail "runtime: release file manifest"
 fi
 
-if grep -q '^scripts/abora-dotfiles-import.sh$' scripts/check-release-files.sh; then
+if grep -q '^scripts/abora-dotfiles-import.sh$' scripts/release/release-required-paths.txt; then
   pass "runtime: release manifest includes dotfiles importer"
 else
   fail "runtime: release manifest includes dotfiles importer"
 fi
 
-# Regression test: check-release-files.sh's own header comment says its list
+# Regression test: release-required-paths.txt (check-release-files.py) is documented as a list that
 # "mirrors abora-update.sh's required_upstream_paths()" -- but nothing ever
 # verified that claim stayed true, and it silently drifted by 9 real files
 # (all 3 Python GUIs, both C# tools' source/csproj/nix files) before this was
@@ -1090,16 +1092,16 @@ fi
 # the one documented, intentional exception (an internal mango build
 # dependency the updater never syncs directly).
 _update_paths="$(sed -n '/^required_upstream_paths() {/,/^}$/p' scripts/abora-update.sh \
-  | grep -E '^[A-Za-z0-9_./-]+$' | sort -u)"
-_release_paths="$(sed -n '/^required_paths() {/,/^}$/p' scripts/check-release-files.sh \
+  | grep -E '^[A-Za-z0-9_./-]+$' | grep -vx 'EOF' | sort -u)"
+_release_paths="$(cat scripts/release/release-required-paths.txt \
   | grep -E '^[A-Za-z0-9_./-]+$' | sort -u)"
 _missing_from_release="$(comm -23 <(printf '%s\n' "$_update_paths") <(printf '%s\n' "$_release_paths"))"
 if [[ -z "$_missing_from_release" ]]; then
-  pass "runtime: check-release-files.sh mirrors abora-update.sh's required_upstream_paths"
+  pass "runtime: release-required-paths.txt mirrors abora-update.sh's required_upstream_paths"
 else
-  fail "runtime: check-release-files.sh mirrors abora-update.sh's required_upstream_paths"
+  fail "runtime: release-required-paths.txt mirrors abora-update.sh's required_upstream_paths"
   printf '%s\n' "$_missing_from_release" | while IFS= read -r _p; do
-    printf '              missing from check-release-files.sh: %s\n' "$_p"
+    printf '              missing from release-required-paths.txt: %s\n' "$_p"
   done
 fi
 
@@ -1407,7 +1409,7 @@ fi
 # missing, and the next nixos-rebuild would fail Nix evaluation outright --
 # the same failure class the abora-adopt-nixos.sh copy-list gap above
 # shipped. required_upstream_paths() (check-full.sh, setup-launcher.sh,
-# setup.desktop) and check-release-files.sh's manifest (same three) had the
+# setup.desktop) and check-release-files' manifest (same three) had the
 # same gap. Runs the real sync_abora_files() (not a copy of it) against
 # this real repo checkout as its "upstream", with
 # prepare_verified_upstream/drop_upstream_git_metadata stubbed out (both do
@@ -1636,20 +1638,20 @@ else
   pass "runtime: v3.14 tag unavailable (manifest check skipped)"
 fi
 
-if scripts/check-release-files.sh >/dev/null \
-  && grep -q '^assets/anix-languages$' scripts/check-release-files.sh \
-  && grep -q '^nix/pkgs/moducpp-anix.nix$' scripts/check-release-files.sh \
-  && grep -q '^tools/moducpp-anix$' scripts/check-release-files.sh \
-  && grep -q '^scripts/abora-build.sh$' scripts/check-release-files.sh \
-  && grep -q '^scripts/abora-adopt-nixos.sh$' scripts/check-release-files.sh \
-  && grep -q '^scripts/abora-gaming.sh$' scripts/check-release-files.sh \
-  && grep -q '^scripts/abora-custom-packages.sh$' scripts/check-release-files.sh \
-  && grep -q '^assets/Abora-LOGO.png$' scripts/check-release-files.sh \
-  && grep -q '^assets/Abora-Text.png$' scripts/check-release-files.sh \
-  && grep -q '^docs/wiki/Abora-Gaming.md$' scripts/check-release-files.sh \
-  && grep -q '^docs/wiki/ANIX-V2-Languages.md$' scripts/check-release-files.sh \
-  && grep -q '^docs/wiki/Updating-Abora.md$' scripts/check-release-files.sh \
-  && grep -q '^vendor/modularity$' scripts/check-release-files.sh \
+if scripts/check-release-files.py >/dev/null \
+  && grep -q '^assets/anix-languages$' scripts/release/release-required-paths.txt \
+  && grep -q '^nix/pkgs/moducpp-anix.nix$' scripts/release/release-required-paths.txt \
+  && grep -q '^tools/moducpp-anix$' scripts/release/release-required-paths.txt \
+  && grep -q '^scripts/abora-build.sh$' scripts/release/release-required-paths.txt \
+  && grep -q '^scripts/abora-adopt-nixos.sh$' scripts/release/release-required-paths.txt \
+  && grep -q '^scripts/abora-gaming.sh$' scripts/release/release-required-paths.txt \
+  && grep -q '^scripts/abora-custom-packages.sh$' scripts/release/release-required-paths.txt \
+  && grep -q '^assets/Abora-LOGO.png$' scripts/release/release-required-paths.txt \
+  && grep -q '^assets/Abora-Text.png$' scripts/release/release-required-paths.txt \
+  && grep -q '^docs/wiki/Abora-Gaming.md$' scripts/release/release-required-paths.txt \
+  && grep -q '^docs/wiki/ANIX-V2-Languages.md$' scripts/release/release-required-paths.txt \
+  && grep -q '^docs/wiki/Updating-Abora.md$' scripts/release/release-required-paths.txt \
+  && grep -q '^vendor/modularity$' scripts/release/release-required-paths.txt \
   && [[ -f assets/anix-languages/mako.json ]] \
   && [[ -f assets/anix-languages/moducpp.json ]] \
   && [[ -f nix/pkgs/moducpp-anix.nix ]] \
@@ -2202,13 +2204,13 @@ else
 fi
 
 # ── Standalone package + release-metadata smoke tests ─────────────────────────
-# These build real (throwaway) packages/manifests via package-anix.sh and
+# These build real (throwaway) packages/manifests via package-anix.py and
 # release-metadata.py rather than just grepping source, since the actual
 # packaging/tarball-manifest logic is exactly what would otherwise only get
 # caught by a real `make release`.
 tmp_anix_pkg_out="$tmp_ok/anix-package-out"
 tmp_anix_pkg_list="$tmp_ok/anix-package-files.txt"
-if ABORA_OUT_DIR="$tmp_anix_pkg_out" scripts/package-anix.sh >/dev/null; then
+if ABORA_OUT_DIR="$tmp_anix_pkg_out" scripts/package-anix.py >/dev/null; then
   anix_pkg_file="$(find "$tmp_anix_pkg_out/packages" -type f -name 'anix-*-abora-*.tar.gz' | head -n 1)"
   if [[ -n "$anix_pkg_file" ]] \
     && tar -tzf "$anix_pkg_file" > "$tmp_anix_pkg_list" \

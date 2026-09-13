@@ -20,32 +20,22 @@ from __future__ import annotations
 
 import hashlib
 import math
-import os
 import re
 import sys
 from datetime import datetime, timezone
 from fractions import Fraction
 from pathlib import Path
 
+from abora_release import as_tag, env, repo_root, sanitize
+
 DEFAULT_RELEASE_NAME = "Abora OS v4 Everest"
 IEC_UNITS = ("K", "M", "G", "T", "P", "E", "Z", "Y")
 
 
-def env(name: str) -> str | None:
-    return os.environ.get(name) or None
-
-
-def find_repo_root(start: Path) -> Path:
-    for directory in (start, *start.parents):
-        if (directory / "flake.nix").is_file():
-            return directory
-    sys.exit("Could not find Abora repo root.")
-
-
 def version_tag(repo: Path) -> str:
+    # Unlike the packagers, a release needs a real VERSION file: a missing one is an error.
     raw = (repo / "VERSION").read_text(encoding="utf-8").replace("\n", "")
-    version = re.sub(r"[^A-Za-z0-9._-]", "", raw) or "dev"
-    return version if version[0] in "Vv" else f"v{version}"
+    return as_tag(sanitize(raw) or "dev")
 
 
 def iec_size(size: int) -> str:
@@ -107,7 +97,7 @@ def package_files(package_dir: Path, tag: str) -> list[Path]:
 
 
 def main() -> int:
-    repo = find_repo_root(Path(__file__).resolve().parent)
+    repo = repo_root(__file__)
     tag = version_tag(repo)
     release_name = env("ABORA_RELEASE_NAME") or DEFAULT_RELEASE_NAME
     out_dir = Path(env("ABORA_OUT_DIR") or repo / "out")

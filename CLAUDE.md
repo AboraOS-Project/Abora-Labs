@@ -34,7 +34,7 @@ Direct script equivalents (same as Make targets):
 ```sh
 ./scripts/check-scripts.sh   # What `make check` runs
 ./scripts/check-desktops.sh  # What `make check-desktops` runs
-./scripts/preflight.sh       # What `make preflight` runs
+./scripts/preflight.py       # What `make preflight` runs
 ./scripts/rebuild-vm.sh      # Rebuild in the VM workspace
 ```
 
@@ -86,7 +86,7 @@ All scripts source `abora-ui.sh` (or `/etc/abora/ui.sh` on-system) for shared pr
 
 ### TinyPM
 
-`vendor/tinypm/` is a vendored copy of TinyPM v4. It provides `grab`, `search`, `term`, `start`, `supdate`, and Abora/ANIX/Nix bridge commands. Packaging happens via `scripts/package-tinypm.sh` → `out/packages/`.
+`vendor/tinypm/` is a vendored copy of TinyPM v4. It provides `grab`, `search`, `term`, `start`, `supdate`, and Abora/ANIX/Nix bridge commands. Packaging happens via `scripts/package-tinypm.py` → `out/packages/`.
 
 ### Desktop Profiles
 

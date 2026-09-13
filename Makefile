@@ -61,13 +61,13 @@ metadata:
 	./scripts/release-metadata.py
 
 tinypm-package:
-	./scripts/package-tinypm.sh
+	./scripts/package-tinypm.py
 
 anix-package:
-	./scripts/package-anix.sh
+	./scripts/package-anix.py
 
 tinypm-image:
-	./scripts/build-tinypm-image.sh
+	./scripts/build-tinypm-image.py
 
 release: iso-all tinypm-package anix-package metadata
 
@@ -137,7 +137,7 @@ check-all:
 	./scripts/check-all-files.sh
 
 preflight:
-	./scripts/preflight.sh
+	./scripts/preflight.py
 
 MODULARITY_VERSION ?= 7.0.0
 MODULARITY_ZIP_ROOT ?= Modularity-$(MODULARITY_VERSION)-Linux

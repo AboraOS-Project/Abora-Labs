@@ -58,7 +58,7 @@ iso-other:
 	ABORA_EDITION=other ./scripts/build-iso.sh
 
 metadata:
-	./scripts/release-metadata.sh
+	./scripts/release-metadata.py
 
 tinypm-package:
 	./scripts/package-tinypm.sh

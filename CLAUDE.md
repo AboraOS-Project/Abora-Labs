@@ -73,7 +73,7 @@ Key scripts:
 | `anix.sh` | ANIX CLI — profile switching, rollback, snapshots, config management |
 | `abora-ui.sh` | Shared UI primitives (colors, `abora_banner`, `abora_kv`, etc.) sourced by all other scripts |
 | `build-iso.sh` | ISO build wrapper around `nix build` |
-| `release-metadata.sh` | Generates checksums, release manifest, and release notes into `out/release/` |
+| `release-metadata.py` | Generates checksums, release manifest, and release notes into `out/release/` |
 | `run-qemu.sh` | QEMU runner — respects `ABORA_QEMU_FRESH`, `ABORA_QEMU_BOOT`, `ABORA_QEMU_NOGRAPHIC` |
 
 ### UI Library Convention

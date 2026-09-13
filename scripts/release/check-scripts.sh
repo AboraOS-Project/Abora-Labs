@@ -51,7 +51,6 @@ bash_scripts=(
   "scripts/preflight.sh"
   "scripts/rebuild-vm.sh"
   "scripts/check-release-files.sh"
-  "scripts/release-metadata.sh"
   "scripts/run-qemu.sh"
   "scripts/check-scripts.sh"
   "scripts/dev-doctor.sh"
@@ -70,6 +69,7 @@ nix_files=(
 )
 
 python_scripts=(
+  "scripts/release-metadata.py"
   "scripts/abora-config-gui.py"
   "scripts/abora-welcome-gui.py"
   "scripts/abora-gaming-welcome-gui.py"
@@ -2203,7 +2203,7 @@ fi
 
 # ── Standalone package + release-metadata smoke tests ─────────────────────────
 # These build real (throwaway) packages/manifests via package-anix.sh and
-# release-metadata.sh rather than just grepping source, since the actual
+# release-metadata.py rather than just grepping source, since the actual
 # packaging/tarball-manifest logic is exactly what would otherwise only get
 # caught by a real `make release`.
 tmp_anix_pkg_out="$tmp_ok/anix-package-out"
@@ -2231,7 +2231,7 @@ for edition in cosmic hyprland gnome kde other; do
 done
 touch "$tmp_ok/packages/tinypm-v0.0.0-abora-${release_tag}.tar.gz"
 touch "$tmp_ok/packages/anix-v0.0.0-abora-${release_tag}.tar.gz"
-if ABORA_OUT_DIR="$tmp_ok" ABORA_RELEASE_STAMP=test scripts/release-metadata.sh >/dev/null; then
+if ABORA_OUT_DIR="$tmp_ok" ABORA_RELEASE_STAMP=test scripts/release-metadata.py >/dev/null; then
   if [[ -f "$tmp_ok/release/SHA256SUMS-${release_tag}.txt" ]] \
     && [[ -f "$tmp_ok/release/RELEASE_MANIFEST-${release_tag}.txt" ]] \
     && [[ -f "$tmp_ok/release/RELEASE_NOTES-${release_tag}.md" ]] \
@@ -2258,7 +2258,7 @@ done
 for edition in cosmic hyprland gnome kde other; do
   touch "$tmp_release_fallback/iso/abora-${edition}-2026.07.27-x86_64-${release_tag}.iso"
 done
-if ABORA_OUT_DIR="$tmp_release_fallback" scripts/release-metadata.sh >/dev/null; then
+if ABORA_OUT_DIR="$tmp_release_fallback" scripts/release-metadata.py >/dev/null; then
   if [[ -f "$tmp_release_fallback/release/SHA256SUMS-${release_tag}.txt" ]] \
     && grep -q "abora-cosmic-2026.07.27-x86_64-${release_tag}.iso" "$tmp_release_fallback/release/SHA256SUMS-${release_tag}.txt" \
     && grep -q "abora-other-2026.07.27-x86_64-${release_tag}.iso" "$tmp_release_fallback/release/SHA256SUMS-${release_tag}.txt" \
@@ -2298,7 +2298,7 @@ else
   fail "runtime: TinyPM container builds the real Rust binaries"
 fi
 
-empty_output="$(ABORA_OUT_DIR="$tmp_empty" scripts/release-metadata.sh 2>&1 || true)"
+empty_output="$(ABORA_OUT_DIR="$tmp_empty" scripts/release-metadata.py 2>&1 || true)"
 if printf '%s' "$empty_output" | grep -q "No ISO files found"; then
   pass "runtime: release-metadata empty-dir guard"
 else

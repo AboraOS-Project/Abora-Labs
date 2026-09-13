@@ -44,11 +44,7 @@ bash_scripts=(
   "scripts/check-desktops.sh"
   "scripts/abora-theme-sync.sh"
   "scripts/abora-update.sh"
-  "scripts/build-iso.sh"
-  "scripts/rebuild-vm.sh"
-  "scripts/run-qemu.sh"
   "scripts/check-scripts.sh"
-  "scripts/dev-doctor.sh"
   "scripts/abora-desktop-preview.sh"
 )
 
@@ -72,6 +68,11 @@ python_scripts=(
   "scripts/package-tinypm.py"
   "scripts/preflight.py"
   "scripts/check-release-files.py"
+  "scripts/release/abora_ui.py"
+  "scripts/build-iso.py"
+  "scripts/rebuild-vm.py"
+  "scripts/run-qemu.py"
+  "scripts/dev-doctor.py"
   "scripts/abora-config-gui.py"
   "scripts/abora-welcome-gui.py"
   "scripts/abora-gaming-welcome-gui.py"
@@ -794,8 +795,8 @@ for file in "${required_files[@]}"; do
   fi
 done
 
-if grep -q 'ABORA_NIXPKGS_PATH' scripts/dev-doctor.sh \
-  && grep -q 'Nix daemon/store' scripts/dev-doctor.sh \
+if grep -q 'ABORA_NIXPKGS_PATH' scripts/dev-doctor.py \
+  && grep -q 'Nix daemon/store' scripts/dev-doctor.py \
   && grep -q 'ABORA_NIXPKGS_PATH' docs/wiki/Building-Abora.md \
   && grep -q 'make doctor' docs/release-checklist.md; then
   pass "developer doctor documents nixpkgs and daemon/store failures"
@@ -4874,14 +4875,14 @@ else
   printf '              found: %s\n' "$_findfiles_out"
 fi
 
-# Regression test: rebuild-vm.sh's fresh-workspace clone used to be a plain
+# Regression test: rebuild-vm's fresh-workspace clone used to be a plain
 # `git clone` with no --branch -- checking out the repo's default HEAD
 # branch (stable) instead of $repo_branch (edge by default), silently, on
 # exactly the scenario this script exists for: a fresh or reset persistent
 # build workspace. Reproduced directly against a real local two-branch
 # repo (no network): a fresh clone with ABORA_REPO_BRANCH=edge against a
 # repo whose default HEAD is "stable" landed on stable every time. Runs
-# the real script end-to-end (build-iso.sh is expected to fail in this
+# the real script end-to-end (build-iso is expected to fail in this
 # sandbox -- there's no real flake.nix -- only the clone step is being
 # checked) and confirms the resulting workspace checkout is actually on
 # the requested branch.
@@ -4908,15 +4909,15 @@ if command -v git >/dev/null 2>&1; then
   (
     cd /tmp
     ABORA_VM_WORKSPACE="$tmp_vm_workspace" ABORA_REPO_URL="$tmp_vm_repo" ABORA_REPO_BRANCH="edge" \
-      bash "$repo_dir/scripts/rebuild-vm.sh" >/dev/null 2>&1 || true
+      "$repo_dir/scripts/rebuild-vm.py" >/dev/null 2>&1 || true
   )
   _vm_branch_after="$(git -C "$tmp_vm_workspace/abora-os" branch --show-current 2>/dev/null || true)"
   _vm_marker_after="$(cat "$tmp_vm_workspace/abora-os/MARKER.txt" 2>/dev/null || true)"
   rm -rf "$tmp_vm_repo" "$tmp_vm_workspace"
   if [[ "$_vm_branch_after" == "edge" && "$_vm_marker_after" == "edge-fake" ]]; then
-    pass "runtime: rebuild-vm.sh clones the requested branch on a fresh workspace"
+    pass "runtime: rebuild-vm clones the requested branch on a fresh workspace"
   else
-    fail "runtime: rebuild-vm.sh clones the requested branch on a fresh workspace"
+    fail "runtime: rebuild-vm clones the requested branch on a fresh workspace"
     printf '              branch after: %s, marker after: %s (wanted edge / edge-fake)\n' \
       "$_vm_branch_after" "$_vm_marker_after"
   fi

@@ -37,25 +37,25 @@ help:
 	@echo "  preflight        - Run full release preflight checks"
 
 iso:
-	ABORA_EDITION=$${ABORA_EDITION:-cosmic} ./scripts/build-iso.sh
+	ABORA_EDITION=$${ABORA_EDITION:-cosmic} ./scripts/build-iso.py
 
 iso-all:
-	ABORA_EDITION=all ./scripts/build-iso.sh
+	ABORA_EDITION=all ./scripts/build-iso.py
 
 iso-cosmic:
-	ABORA_EDITION=cosmic ./scripts/build-iso.sh
+	ABORA_EDITION=cosmic ./scripts/build-iso.py
 
 iso-hyprland:
-	ABORA_EDITION=hyprland ./scripts/build-iso.sh
+	ABORA_EDITION=hyprland ./scripts/build-iso.py
 
 iso-gnome:
-	ABORA_EDITION=gnome ./scripts/build-iso.sh
+	ABORA_EDITION=gnome ./scripts/build-iso.py
 
 iso-kde:
-	ABORA_EDITION=kde ./scripts/build-iso.sh
+	ABORA_EDITION=kde ./scripts/build-iso.py
 
 iso-other:
-	ABORA_EDITION=other ./scripts/build-iso.sh
+	ABORA_EDITION=other ./scripts/build-iso.py
 
 metadata:
 	./scripts/release-metadata.py
@@ -72,30 +72,30 @@ tinypm-image:
 release: iso-all tinypm-package anix-package metadata
 
 build-vm:
-	./scripts/rebuild-vm.sh
+	./scripts/rebuild-vm.py
 
 qemu:
-	./scripts/run-qemu.sh
+	./scripts/run-qemu.py
 
 run: qemu
 
 qemu-fresh:
-	ABORA_QEMU_FRESH=1 ./scripts/run-qemu.sh
+	ABORA_QEMU_FRESH=1 ./scripts/run-qemu.py
 
 qemu-disk:
-	ABORA_QEMU_BOOT=disk ./scripts/run-qemu.sh
+	ABORA_QEMU_BOOT=disk ./scripts/run-qemu.py
 
 qemu-serial:
-	ABORA_QEMU_NOGRAPHIC=1 ./scripts/run-qemu.sh
+	ABORA_QEMU_NOGRAPHIC=1 ./scripts/run-qemu.py
 
 qemu-fresh-serial:
-	ABORA_QEMU_FRESH=1 ABORA_QEMU_NOGRAPHIC=1 ./scripts/run-qemu.sh
+	ABORA_QEMU_FRESH=1 ABORA_QEMU_NOGRAPHIC=1 ./scripts/run-qemu.py
 
 qemu-debug:
-	ABORA_QEMU_SERIAL_STDIO=1 ./scripts/run-qemu.sh
+	ABORA_QEMU_SERIAL_STDIO=1 ./scripts/run-qemu.py
 
 qemu-fresh-debug:
-	ABORA_QEMU_FRESH=1 ABORA_QEMU_SERIAL_STDIO=1 ./scripts/run-qemu.sh
+	ABORA_QEMU_FRESH=1 ABORA_QEMU_SERIAL_STDIO=1 ./scripts/run-qemu.py
 
 qmec: qemu
 
@@ -121,7 +121,7 @@ test-config:
 	rm -rf "$$tmp"
 
 doctor:
-	./scripts/dev-doctor.sh
+	./scripts/dev-doctor.py
 
 desktop-preview:
 	@[ -n "$(PROFILE)" ] || { echo "Usage: make desktop-preview PROFILE=gnome [XKB=us] [DESKTOP_USER=user]"; exit 1; }

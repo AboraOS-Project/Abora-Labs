@@ -81,10 +81,10 @@ Important files:
 - `scripts/check-scripts.sh`: repo script and runtime sanity checks
 - `scripts/check-all-files.sh`: broad syntax, links, YAML, JSON, and docs sweep
 - `scripts/check-desktops.sh`: evaluates every supported desktop profile
-- `scripts/build-iso.sh`: ISO-only build path
+- `scripts/build-iso.py`: ISO-only build path
 - `scripts/package-tinypm.py`: TinyPM release package path
 - `scripts/release-metadata.py`: checksums, manifest, and release notes
-- `scripts/run-qemu.sh`: QEMU ISO, fresh-disk, disk-only, and serial helpers
+- `scripts/run-qemu.py`: QEMU ISO, fresh-disk, disk-only, and serial helpers
 
 ### `vendor/`
 

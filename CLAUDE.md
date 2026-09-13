@@ -35,7 +35,7 @@ Direct script equivalents (same as Make targets):
 ./scripts/check-scripts.sh   # What `make check` runs
 ./scripts/check-desktops.sh  # What `make check-desktops` runs
 ./scripts/preflight.py       # What `make preflight` runs
-./scripts/rebuild-vm.sh      # Rebuild in the VM workspace
+./scripts/rebuild-vm.py      # Rebuild in the VM workspace
 ```
 
 Before pushing any change, run `make check` — it validates bash syntax, executability, required file presence, git tracking, nix flake evaluation, and several ANIX/release-metadata runtime behaviors.
@@ -46,7 +46,7 @@ Before pushing any change, run `make check` — it validates bash syntax, execut
 
 `flake.nix` is the Nix entrypoint. It pins `nixpkgs/nixos-26.05`, exposes `nixosModules` (installed-base, anix), and produces the `abora-live` ISO. The only NixOS configuration used at build time is `nix/profiles/live.nix`.
 
-`scripts/build-iso.sh` calls `nix build` targeting `#packages.x86_64-linux.iso` and copies the result to `out/iso/`.
+`scripts/build-iso.py` calls `nix build` targeting `#packages.x86_64-linux.iso-<edition>` and copies the result to `out/iso/`.
 
 Generated output goes in `out/` (never treat as source — it's gitignored).
 
@@ -72,9 +72,9 @@ Key scripts:
 | `abora-session-setup.sh` | First-session desktop defaults |
 | `anix.sh` | ANIX CLI — profile switching, rollback, snapshots, config management |
 | `abora-ui.sh` | Shared UI primitives (colors, `abora_banner`, `abora_kv`, etc.) sourced by all other scripts |
-| `build-iso.sh` | ISO build wrapper around `nix build` |
+| `build-iso.py` | ISO build wrapper around `nix build` |
 | `release-metadata.py` | Generates checksums, release manifest, and release notes into `out/release/` |
-| `run-qemu.sh` | QEMU runner — respects `ABORA_QEMU_FRESH`, `ABORA_QEMU_BOOT`, `ABORA_QEMU_NOGRAPHIC` |
+| `run-qemu.py` | QEMU runner — respects `ABORA_QEMU_FRESH`, `ABORA_QEMU_BOOT`, `ABORA_QEMU_NOGRAPHIC` |
 
 ### UI Library Convention
 

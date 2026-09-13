@@ -56,6 +56,8 @@ STAGED_FILES = (
     ("nix/pkgs/scenefx-0_5.nix", "pkgs/scenefx-0_5.nix"),
     ("nix/pkgs/modularity.nix", "pkgs/modularity.nix"),
     ("nix/pkgs/moducpp-anix.nix", "pkgs/moducpp-anix.nix"),
+    ("nix/pkgs/vanta.nix", "pkgs/vanta.nix"),
+    ("nix/pkgs/abora-update.nix", "pkgs/abora-update.nix"),
     ("tools/moducpp-anix", "tools/moducpp-anix"),
     ("scripts/abora-ui.sh", "ui.sh"),
     ("scripts/abora-config.sh", "config.sh"),
@@ -95,6 +97,7 @@ STAGED_TREES = (
     ("nix/modules/desktops", "desktops"),
     ("vendor/modularity", "vendor/modularity"),
     ("vendor/tinypm", "tinypm"),
+    ("tools/abora-update", "abora-update"),
 )
 
 # Prints, NUL-separated, for each profile: name, label, variant id, config block, package block.

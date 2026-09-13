@@ -9,6 +9,8 @@ nix/pkgs/modularity.nix
 nix/pkgs/moducpp-anix.nix
 nix/pkgs/abora-update-resolver.nix
 nix/pkgs/abora-update-resolver-deps.json
+nix/pkgs/vanta.nix
+nix/pkgs/abora-update.nix
 nix/pkgs/abora-plan-tool.nix
 nix/pkgs/abora-plan-tool-deps.json
 scripts/abora-update.sh
@@ -45,6 +47,7 @@ docs/wiki/Updating-Abora.md
 tools/moducpp-anix
 tools/abora-update-resolver/AboraUpdateResolver.csproj
 tools/abora-update-resolver/Program.cs
+tools/abora-update/main.vanta
 tools/abora-plan-tool/AboraPlanTool.csproj
 tools/abora-plan-tool/Program.cs
 assets/mango/config.conf

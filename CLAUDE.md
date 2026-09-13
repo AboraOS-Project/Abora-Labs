@@ -84,6 +84,10 @@ All scripts source `abora-ui.sh` (or `/etc/abora/ui.sh` on-system) for shared pr
 
 `scripts/anix.sh` reads config from `ANIX_SYSTEM_CONFIG` (defaults to `/etc/nixos`) and writes settings to `anix.nix` in that directory. Profile names map to flake output names (e.g., `anix switch nix gaming` → `nixos-rebuild switch --flake /etc/nixos#gaming`). `ANIX_NO_SUDO=1` and `ANIX_ASSUME_YES=1` env vars are used in tests to bypass sudo and prompts.
 
+### Vanta tools
+
+`tools/abora-update/` is the Vanta core of `abora update` (release channel resolution and the downgrade guard so far), called by `scripts/abora-update.sh` through the same CLI as the C# `tools/abora-update-resolver` it replaces, which stays as a fallback for now. It runs on the Vanta interpreter packaged in `nix/pkgs/vanta.nix` (pinned to a Vanta commit) and ships as `nix/pkgs/abora-update.nix`. Unit tests: `vanta run tools/abora-update/tests.vanta` (also run by `make check` when a new-enough Vanta is found).
+
 ### TinyPM
 
 `vendor/tinypm/` is a vendored copy of TinyPM v4. It provides `grab`, `search`, `term`, `start`, `supdate`, and Abora/ANIX/Nix bridge commands. Packaging happens via `scripts/package-tinypm.py` → `out/packages/`.

@@ -120,12 +120,67 @@ def build_dotnet_tool(ctx: Context, label: str, project: str, dll: str):
     return wrapper
 
 
+# A program that only runs on a Vanta with the language features Abora's tools use.
+VANTA_PROBE = """module Probe;
+func Start()::void {
+    mut seen::list<string> = [];
+    for arg in Env.Args() { seen = List.Push(seen, arg); }
+    let n = ask String.ToInt("7") else { return; };
+    if List.Length(seen) == 1 && n == 7 { Process.Exit(0); }
+    Process.Exit(1);
+}
+"""
+
+
+def find_vanta(ctx: Context):
+    """A Vanta interpreter new enough for tools/abora-update: $ABORA_VANTA_BIN, `vanta`
+    on PATH, or the flake's pinned build (`nix build .#vanta`). None if unavailable."""
+    probe = ctx.tmp / "probe.vanta"
+    probe.write_text(VANTA_PROBE)
+
+    def usable(binary: str | None) -> bool:
+        return bool(binary) and ctx.run([binary, "run", str(probe), "x"], quiet=True).returncode == 0
+
+    for candidate in (os.environ.get("ABORA_VANTA_BIN"), shutil.which("vanta")):
+        if usable(candidate):
+            return candidate
+    if shutil.which("nix"):
+        built = ctx.run(
+            ["nix", "--extra-experimental-features", "nix-command flakes", "build", "--no-link", "--print-out-paths", f"{ctx.repo}#vanta"],
+            capture=True,
+        )
+        binary = f"{built.stdout.strip().splitlines()[-1]}/bin/vanta" if built.returncode == 0 and built.stdout.strip() else None
+        if usable(binary):
+            return binary
+    return None
+
+
+def vanta_update_tool(ctx: Context):
+    """tools/abora-update's unit tests, and an `abora-update` executable for the updater suite."""
+    vanta = find_vanta(ctx)
+    if vanta is None:
+        ctx.ok("vanta unavailable (abora-update Vanta tests skipped; updater suite uses the C# resolver)")
+        return None
+    tests = ctx.run([vanta, "run", "tools/abora-update/tests.vanta"], capture=True)
+    if not ctx.result(tests.returncode == 0, "abora-update: Vanta unit tests"):
+        ctx.detail("\n".join(line for line in tests.stdout.splitlines() if not line.startswith("ok ")))
+        return None
+    wrapper = ctx.tmp / "abora-update"
+    wrapper.write_text(
+        f"#!/usr/bin/env python3\nimport os, sys\nos.execv({vanta!r}, [{vanta!r}, 'run', {str(ctx.repo / 'tools/abora-update/main.vanta')!r}, *sys.argv[1:]])\n"
+    )
+    wrapper.chmod(0o755)
+    return wrapper
+
+
 def run(ctx: Context) -> None:
     # The updater and ANIX suites need real resolver/plan-tool binaries: there is no Bash fallback.
-    ctx.resolver_bin = build_dotnet_tool(
+    # The updater prefers the Vanta abora-update; the C# resolver remains its fallback.
+    csharp_resolver = build_dotnet_tool(
         ctx, "abora-update-resolver", "tools/abora-update-resolver/AboraUpdateResolver.csproj",
         "tools/abora-update-resolver/bin/Debug/net10.0/abora-update-resolver.dll",
     )
+    ctx.resolver_bin = vanta_update_tool(ctx) or csharp_resolver
     ctx.plan_tool_bin = build_dotnet_tool(
         ctx, "abora-plan-tool", "tools/abora-plan-tool/AboraPlanTool.csproj",
         "tools/abora-plan-tool/bin/Debug/net10.0/abora-plan-tool.dll",

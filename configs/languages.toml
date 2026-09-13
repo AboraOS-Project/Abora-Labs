@@ -101,14 +101,12 @@ artifacts = ["bin/{name}"]
 [vanta]
 display = "Vanta"
 extensions = [".vanta"]
-requires = ["vanta", "make"]
+requires = ["vanta"]
 [vanta.scaffold]
-# Vanta 0.1 has no imports, build or test subcommand: a Makefile joins the
-# sources into build/*.vanta, and the interpreter runs the result.
-build = ["make"]
-test = ["vanta", "run", "build/main_test.vanta"]
-run = ["vanta", "run", "build/main.vanta"]
-clean = ["make", "clean"]
+# Interpreted: no build stage. Modules (@use) resolve beside the entry file, so
+# the program and its tests both live in src/.
+test = ["vanta", "run", "src/main_test.vanta"]
+run = ["vanta", "run", "src/main.vanta"]
 test_format = "labs"
 
 [python]
